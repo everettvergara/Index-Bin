@@ -30,7 +30,7 @@ namespace g80 {
 
         auto add_to_bin(uint_type ix) -> bool {
             #ifndef UNSAFE_OPTIM
-            if (ix >= N - 1) return false;
+            if (ix >= N) return false;
             if (bin_loc_[ix] != invalid_ptr_) return false;
             #endif
 
@@ -41,7 +41,7 @@ namespace g80 {
 
         auto remove_from_bin(uint_type ix) -> bool {
             #ifndef UNSAFE_OPTIM
-            if (ix >= N - 1) return false;
+            if (ix >= N) return false;
             if (bin_loc_[ix] == invalid_ptr_) return false;
             #endif
 
