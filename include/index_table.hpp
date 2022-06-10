@@ -31,6 +31,7 @@ namespace g80 {
         auto add_to_bin(uint_type ix) -> bool {
             #ifndef UNSAFE_OPTIM
             if (ix >= N - 1) return false;
+            if (bin_loc_[ix] != invalid_ptr_) return false;
             #endif
 
             ix_bin_[++bin_ptr_] = ix;
@@ -41,6 +42,7 @@ namespace g80 {
         auto remove_from_bin(uint_type ix) -> bool {
             #ifndef UNSAFE_OPTIM
             if (ix >= N - 1) return false;
+            if (bin_loc_[ix] == invalid_ptr_) return false;
             #endif
 
             std::swap(ix_bin_[bin_loc_[ix]], ix_bin_[bin_ptr_--]);
@@ -52,8 +54,9 @@ namespace g80 {
             return bin_ptr_ + 1;
         }
 
-        inline auto get_ix_bin() const -> const std::array<uint_type, N> {return ix_bin_;}
-        inline auto bin_loc() const -> const std::array<uint_type, N> {return bin_loc_;}
+        inline auto get_ix_bin() const -> const std::array<uint_type, N> & {return ix_bin_;}
+        inline auto get_bin_loc() const -> const std::array<uint_type, N> & {return bin_loc_;}
+        inline auto get_bin_ptr() const -> uint_type {return bin_ptr_;}
 
         // TODO: Add forward iterator for list of available indexes in the bin
 
@@ -61,8 +64,7 @@ namespace g80 {
         const uint_type invalid_ptr_{~static_cast<uint_type>(0)};
         std::array<uint_type, N> ix_bin_;
         std::array<uint_type, N> bin_loc_;
-        uint_type bin_ptr_{invalid_ptr_};
-        
+        uint_type bin_ptr_{invalid_ptr_};  
     };
 }
 
