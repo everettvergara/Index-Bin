@@ -16,7 +16,7 @@
 
 namespace g80 {
 
-    #define UNSAFE_OPTIM
+    // #define UNSAFE_OPTIM
 
     template<typename uint_type, uint_type N>
     class index_table {
