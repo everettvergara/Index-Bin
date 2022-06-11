@@ -107,7 +107,8 @@ namespace g80 {
         }
 
         auto reset_mapper_() -> void {
-            for (int i = 0; i < size_; ++i) mapper_[i] = i;
+
+            for (int i = 0; i < size_; ++i) {bin_[i] = i; mapper_[i] = i;}
         }
     
         auto copy_index_bin(const index_bin &rhs) -> void {
@@ -121,6 +122,7 @@ namespace g80 {
             rhs.ix_bin_ = {nullptr};
             rhs.bin_loc_ = {nullptr};
         }
+
     // public:
 
     //     auto reset(const uint_type size) {
@@ -199,21 +201,8 @@ namespace g80 {
             if (ix_to_use >= size_) return false;
             if (mapper_[ix_to_use] < start_of_unused_ix_) return false;
             
-            /**
-             * Bin:
-             * Used     | Unused
-             * 0 1 2 3    4 5 6 7 8 9 10
-             * 4 5 2 10 | 0 9 1 3 6 7 8 
-             *            ^ ^  
-             *              u
-             * Index Mapper
-             * 0 1 2 3 4 5 6 7 8  9 10
-             * 4 6 2 7 0 1 8 9 10 5 3  
-             * ^                  ^
-             */
-
-            std::swap(bin_[mapper_[start_of_unused_ix_]], bin_[mapper_[ix_to_use]]);
-            std::swap(mapper_[start_of_unused_ix_], mapper_[ix_to_use]);
+            std::swap(bin_[start_of_unused_ix_], bin_[mapper_[ix_to_use]]);
+            std::swap(mapper_[bin_[mapper_[ix_to_use]]], mapper_[ix_to_use]);
             ++start_of_unused_ix_;
 
             return true;
@@ -223,28 +212,23 @@ namespace g80 {
             if (ix_to_unuse >= size_) return false;
             if (mapper_[ix_to_unuse] >= start_of_unused_ix_) return false;
             
-            /**
-             * Bin:
-             * Used     | Unused
-             * 0 1 2 3    4 5 6 7 8 9 10
-             * 4 5 2 10 | 0 9 1 3 6 7 8 
-             *     ^  ^ 
-             *              
-             * Index Mapper
-             * 0 1 2 3 4 5 6 7 8  9 10
-             * 4 6 2 7 0 1 8 9 10 5 3  
-             *     ^                ^
-             */
-
             --start_of_unused_ix_;
-            std::swap(bin_[mapper_[start_of_unused_ix_]], bin_[mapper_[ix_to_unuse]]);
-            std::swap(mapper_[start_of_unused_ix_], mapper_[ix_to_unuse]);
+            std::swap(bin_[start_of_unused_ix_], bin_[mapper_[ix_to_unuse]]);
+            std::swap(mapper_[bin_[mapper_[ix_to_unuse]]], mapper_[ix_to_unuse]);
             
             return true;
         }
 
-        inline auto size() -> uint_type {
+        inline auto size() const -> uint_type {
             return size_;
+        }
+
+        inline auto get_mapper() const -> uint_type * {
+            return mapper_;
+        }
+
+        inline auto start_of_unused_ix() const -> uint_type {
+            return start_of_unused_ix_;
         }
 
         inline auto cbegin_used() const -> const uint_type * {
@@ -270,22 +254,6 @@ namespace g80 {
 
     public:
 
-        // struct iterator {
-        // private:
-        //     uint_type *ptr;
-        // public:
-        //     iterator(uint_type *data) {ptr = data;}
-        //     auto operator*() -> uint_type & {return *ptr;}
-        //     auto operator->() -> uint_type * {return ptr;}
-        //     auto operator++() -> iterator & {++ptr; return *this;};
-        //     auto operator++(int) -> iterator {iterator t = *this; ++ptr; return t;};
-        //     friend auto operator ==(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr == rhs.ptr;}
-        //     friend auto operator !=(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr != rhs.ptr;}
-        // };
-
-        // auto begin() const -> iterator {return iterator(ix_bin_);}
-        // auto end() const -> iterator {return iterator(ix_bin_ + last_ix_ + 1);}
-
     /**
      * Internal table index variables 
      * 
@@ -293,12 +261,8 @@ namespace g80 {
 
     private:
     
-        // static constexpr uint_type INVALID_IX = ~static_cast<uint_type>(0);
         uint_type size_, start_of_unused_ix_{0};
         uint_type *bin_, *mapper_;
-
-        // uint_type last_ix_{INVALID_IX};  
-        // uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
     };
 }
 
