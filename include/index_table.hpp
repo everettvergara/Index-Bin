@@ -7,11 +7,28 @@
  * 
  * @copyright Copyright (c) 2022
  * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * 
+ * @note: 
+ * 
+ * The maximum values that can be stored in an index_table class is:
+ *      2 ^ size_in_bits(uint_type) - 1
+ * 
+ * Because index_table uses ~static_cast<uint_type>(0) as its invalid index
+ * 
  */
-
-        // Maximum values that can be stored in index table = 2^size_in_bits(uint_type) - 1
-        // Index Table uses ~static_cast<uint_type>(0) as invalid ix
-
 
 #ifndef INDEX_TABLE_HPP
 #define INDEX_TABLE_HPP
@@ -44,13 +61,12 @@ namespace g80 {
         }
 
         auto reset_bin_loc_() -> void {
-            memset(bin_loc_, ~0, sizeof(uint_type) * size_);
+            memset(bin_loc_, ~static_cast<int>(0), sizeof(uint_type) * size_);
         }
-
-        auto reset() -> void {
-            del_ix_bin_loc();
-            new_ix_bin_loc();
-            reset_bin_loc_();
+    
+        auto copy_index_table(const index_table &rhs) -> void {
+            std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
+            std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
         }
 
     public:
@@ -60,13 +76,7 @@ namespace g80 {
             last_ix_ = {INVALID_IX};
             reset();
         }
-    
-    private:
 
-        auto copy_index_table(const index_table &rhs) -> void {
-            std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
-            std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
-        }
         
     /**
      * Constructor, Destructor and 
@@ -104,10 +114,10 @@ namespace g80 {
 
         auto operator=(index_table &&rhs) -> index_table & {
             
+            del_ix_bin_loc();
+            
             size_ = rhs.size_;
             last_ix_ = rhs.last_ix_;
-            
-            del_ix_bin_loc();
             ix_bin_ = rhs.ix_bin_;
             bin_loc_ = rhs.bin_loc_;
 
@@ -122,6 +132,13 @@ namespace g80 {
         ~index_table() {
             del_ix_bin_loc();
         }
+
+    /**
+     * Public Interface
+     * 
+     */
+
+    public:
 
         auto add_to_bin(uint_type ix_to_add) -> bool {
             #ifndef UNSAFE_OPTIM
@@ -153,6 +170,13 @@ namespace g80 {
         inline auto get_bin_loc() const -> const uint_type *& {return bin_loc_;}
         inline auto get_bin_ptr() const -> uint_type {return last_ix_;}
 
+    /**
+     * Iterator functions
+     * 
+     */
+
+    public:
+
         struct iterator {
         private:
             uint_type *ptr;
@@ -169,6 +193,11 @@ namespace g80 {
         auto begin() const -> iterator {return iterator(ix_bin_);}
         auto end() const -> iterator {return iterator(ix_bin_ + last_ix_ + 1);}
 
+    /**
+     * Internal table index variables 
+     * 
+     */
+
     private:
     
         static constexpr uint_type INVALID_IX {~static_cast<uint_type>(0)};
@@ -176,7 +205,6 @@ namespace g80 {
         uint_type last_ix_{INVALID_IX};  
         uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
     };
-
 }
 
 #endif
