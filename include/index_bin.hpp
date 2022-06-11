@@ -212,8 +212,8 @@ namespace g80 {
              * ^                  ^
              */
 
-            std::swap(bin[mapper[start_of_unused_ix_]], bin[mapper[ix_to_use]]);
-            std::swap(mapper[start_of_unused_ix_], mapper[ix_to_use]);
+            std::swap(bin_[mapper_[start_of_unused_ix_]], bin_[mapper_[ix_to_use]]);
+            std::swap(mapper_[start_of_unused_ix_], mapper_[ix_to_use]);
             ++start_of_unused_ix_;
 
             return true;
@@ -235,21 +235,33 @@ namespace g80 {
              * 4 6 2 7 0 1 8 9 10 5 3  
              *     ^                ^
              */
-            
+
             --start_of_unused_ix_;
-            std::swap(bin[mapper[start_of_unused_ix_]], bin[mapper[ix_to_use]]);
-            std::swap(mapper[start_of_unused_ix_], mapper[ix_to_use]);
+            std::swap(bin_[mapper_[start_of_unused_ix_]], bin_[mapper_[ix_to_unuse]]);
+            std::swap(mapper_[start_of_unused_ix_], mapper_[ix_to_unuse]);
             
             return true;
         }
 
-    //     inline auto size() -> uint_type {
-    //         return last_ix_ + 1;
-    //     }
+        inline auto size() -> uint_type {
+            return size_;
+        }
 
-    //     inline auto get_ix_bin() const -> const uint_type *& {return ix_bin_;}
-    //     inline auto get_bin_loc() const -> const uint_type *& {return bin_loc_;}
-    //     inline auto get_bin_ptr() const -> uint_type {return last_ix_;}
+        inline auto cbegin_used() const -> const uint_type * {
+            return start_of_unused_ix_ == 0 ? nullptr : &bin_[0];
+        }
+
+        inline auto cend_used() const -> const uint_type * {
+            return start_of_unused_ix_ == 0 ? nullptr : &bin_[0] + start_of_unused_ix_;
+        }
+
+        inline auto cbegin_unused() const -> const uint_type * {
+            return &bin_[0] + start_of_unused_ix_;
+        }
+        
+        inline auto cend_unused() const -> const uint_type * {
+            return &bin_[0] + size_;
+        }
 
     /**
      * Iterator functions
