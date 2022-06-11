@@ -73,10 +73,14 @@ namespace g80 {
         struct iterator {
         private:
             uint_type *ptr;
-
         public:
             iterator(uint_type *data) {ptr = data;}
-
+            auto operator *() -> uint_type & {return *ptr;}
+            auto operator ->() -> uint_type * {return ptr;}
+            auto operator ++() -> iterator & {++ptr; return *this;};
+            auto operator ++(int) -> iterator {iterator t = *this; ++ptr; return t;};
+            friend auto operator ==(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr == rhs.ptr;}
+            friend auto operator !=(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr != rhs.ptr;}
         };
 
     private:
