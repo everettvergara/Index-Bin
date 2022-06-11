@@ -20,7 +20,10 @@ namespace g80 {
 
     template<typename uint_type, uint_type N>
     class index_table {
+    
+
     public:
+    
         index_table() {reset();}
 
         auto reset() -> void {
@@ -58,9 +61,33 @@ namespace g80 {
         inline auto get_bin_loc() const -> const std::array<uint_type, N> & {return bin_loc_;}
         inline auto get_bin_ptr() const -> uint_type {return bin_ptr_;}
 
-        // TODO: Add forward iterator for list of available indexes in the bin
+        
+
+    public:
+
+        struct iterator {
+        private:
+            uint_type *ptr;
+        
+        public:
+            iterator(uint_type *begin) :  ptr = begin {}
+            auto operator*() const -> uint_type & {return *ptr;}
+            auto operator->() -> uint_type * {return ptr;}
+            auto operator++() -> iterator & {++ptr; return *this;}
+            auto operator++(int) -> iterator {iterator t = *this; ++ptr; return t;}
+            friend auto operator==(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr == rhs.ptr;}
+            friend auto operator!=(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr != rhs.ptr;}
+        };
+
+        auto begin() const -> iterator {return iterator(ix_bin_.data())}
+        auto end() const -> iterator {return iterator(ix_bin_.data() + bin_ptr_ + 1)}
+        auto cbegin() const -> iterator {return iterator(ix_bin_.data())}
+        auto cend() const -> iterator {return iterator(ix_bin_.data() + bin_ptr_ + 1)}
+
+    // Private Variables of index_table
 
     private:
+    
         const uint_type invalid_ptr_{~static_cast<uint_type>(0)};
         std::array<uint_type, N> ix_bin_;
         std::array<uint_type, N> bin_loc_;
