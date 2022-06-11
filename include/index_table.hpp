@@ -21,7 +21,8 @@ namespace g80 {
     
 
     public:
-        // Maximum values that can be stored in index table = 2^sizeof(uint_type) - 1
+        
+        // Maximum values that can be stored in index table = 2^size_in_bits(uint_type) - 1
         // Index Table uses ~static_cast<uint_type>(0) as invalid ix
 
         index_table(uint_type size) : size_(size) {reset(size_);}
@@ -69,6 +70,15 @@ namespace g80 {
         inline auto get_bin_loc() const -> const uint_type *& {return bin_loc_;}
         inline auto get_bin_ptr() const -> uint_type {return last_ix_;}
 
+        struct iterator {
+        private:
+            uint_type *ptr;
+
+        public:
+            iterator(uint_type *data) {ptr = data;}
+
+        };
+
     private:
     
         static constexpr uint_type INVALID_IX {~static_cast<uint_type>(0)};
@@ -77,8 +87,6 @@ namespace g80 {
         uint_type last_ix_{INVALID_IX};  
     };
 
-    // template<typename uint_type>
-    // constexpr uint_type index_table<uint_type>::INVALID_IX {~static_cast<uint_type>(0)};
 }
 
 #endif
