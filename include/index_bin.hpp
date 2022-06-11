@@ -123,13 +123,14 @@ namespace g80 {
             rhs.bin_loc_ = {nullptr};
         }
 
-    // public:
+    public:
 
-    //     auto reset(const uint_type size) {
-    //         size_(size);
-    //         last_ix_ = {INVALID_IX};
-    //         reset();
-    //     }
+        auto reset(const uint_type size) {
+            size_ = (size);
+            start_of_unused_ix_ = {0};
+            del_bin_and_mapper();
+            reset_mapper_();
+        }
 
         
     /**
