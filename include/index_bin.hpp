@@ -92,36 +92,36 @@ namespace g80 {
      * 
      */
 
-    private:
+    // private:
 
-        auto del_ix_bin_loc() -> void {
-            delete []ix_bin_;
-            delete []bin_loc_;
-            ix_bin_ = {nullptr};
-            bin_loc_ = {nullptr};
-        }
+    //     auto del_ix_bin_loc() -> void {
+    //         delete []ix_bin_;
+    //         delete []bin_loc_;
+    //         ix_bin_ = {nullptr};
+    //         bin_loc_ = {nullptr};
+    //     }
 
-        auto new_ix_bin_loc() -> void {
-            ix_bin_ = new uint_type[size_];
-            bin_loc_ = new uint_type[size_];
-        }
+    //     auto new_ix_bin_loc() -> void {
+    //         ix_bin_ = new uint_type[size_];
+    //         bin_loc_ = new uint_type[size_];
+    //     }
 
-        auto reset_bin_loc_() -> void {
-            std::fill_n(bin_loc_, size_, INVALID_IX);
-        }
+    //     auto reset_bin_loc_() -> void {
+    //         std::fill_n(bin_loc_, size_, INVALID_IX);
+    //     }
     
-        auto copy_index_bin(const index_bin &rhs) -> void {
-            std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
-            std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
-        }
+    //     auto copy_index_bin(const index_bin &rhs) -> void {
+    //         std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
+    //         std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
+    //     }
 
-    public:
+    // public:
 
-        auto reset(const uint_type size) {
-            size_(size);
-            last_ix_ = {INVALID_IX};
-            reset();
-        }
+    //     auto reset(const uint_type size) {
+    //         size_(size);
+    //         last_ix_ = {INVALID_IX};
+    //         reset();
+    //     }
 
         
     /**
@@ -132,89 +132,89 @@ namespace g80 {
 
     public:
         
-        index_bin(uint_type size) : size_(size) {
-            new_ix_bin_loc();
-            reset_bin_loc_();
-        }
+        // index_bin(uint_type size) : size_(size) {
+        //     new_ix_bin_loc();
+        //     reset_bin_loc_();
+        // }
 
-        index_bin(const index_bin &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
-            copy_index_bin(rhs);
-        }
+        // index_bin(const index_bin &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
+        //     copy_index_bin(rhs);
+        // }
 
-        index_bin(index_bin &&rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_), ix_bin_(rhs.ix_bin_), bin_loc_(rhs.bin_loc_) {
-            rhs.size_ = {0};
-            rhs.last_ix_ = rhs.INVALID_IX;
-            rhs.ix_bin_ = {nullptr};
-            rhs.bin_loc_ = {nullptr};
-        }
+        // index_bin(index_bin &&rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_), ix_bin_(rhs.ix_bin_), bin_loc_(rhs.bin_loc_) {
+        //     rhs.size_ = {0};
+        //     rhs.last_ix_ = rhs.INVALID_IX;
+        //     rhs.ix_bin_ = {nullptr};
+        //     rhs.bin_loc_ = {nullptr};
+        // }
 
-        auto operator=(const index_bin &rhs) -> index_bin & {
-            del_ix_bin_loc();
+        // auto operator=(const index_bin &rhs) -> index_bin & {
+        //     del_ix_bin_loc();
             
-            size_ = rhs.size_;
-            last_ix_ = rhs.last_ix_;
-            new_ix_bin_loc();
-            copy_index_bin(rhs);
-            return *this;
-        }
+        //     size_ = rhs.size_;
+        //     last_ix_ = rhs.last_ix_;
+        //     new_ix_bin_loc();
+        //     copy_index_bin(rhs);
+        //     return *this;
+        // }
 
-        auto operator=(index_bin &&rhs) -> index_bin & {
+        // auto operator=(index_bin &&rhs) -> index_bin & {
             
-            del_ix_bin_loc();
+        //     del_ix_bin_loc();
             
-            size_ = rhs.size_;
-            last_ix_ = rhs.last_ix_;
-            ix_bin_ = rhs.ix_bin_;
-            bin_loc_ = rhs.bin_loc_;
+        //     size_ = rhs.size_;
+        //     last_ix_ = rhs.last_ix_;
+        //     ix_bin_ = rhs.ix_bin_;
+        //     bin_loc_ = rhs.bin_loc_;
 
-            rhs.size_ = {0};
-            rhs.last_ix_ = rhs.INVALID_IX;
-            rhs.ix_bin_ = {nullptr};
-            rhs.bin_loc_ = {nullptr};
+        //     rhs.size_ = {0};
+        //     rhs.last_ix_ = rhs.INVALID_IX;
+        //     rhs.ix_bin_ = {nullptr};
+        //     rhs.bin_loc_ = {nullptr};
 
-            return *this;
-        }
+        //     return *this;
+        // }
 
-        ~index_bin() {
-            del_ix_bin_loc();
-        }
+        // ~index_bin() {
+        //     del_ix_bin_loc();
+        // }
 
     /**
      * Public Interface
      * 
      */
 
-    public:
+    // public:
 
-        auto add_to_bin(uint_type ix_to_add) -> bool {
-            #ifndef UNSAFE_OPTIM
-            if (ix_to_add >= size_) return false;
-            if (bin_loc_[ix_to_add] != INVALID_IX) return false;
-            #endif
+    //     auto add_to_bin(uint_type ix_to_add) -> bool {
+    //         #ifndef UNSAFE_OPTIM
+    //         if (ix_to_add >= size_) return false;
+    //         if (bin_loc_[ix_to_add] != INVALID_IX) return false;
+    //         #endif
 
-            ix_bin_[++last_ix_] = ix_to_add;
-            bin_loc_[ix_to_add] = last_ix_;
-            return true;
-        }
+    //         ix_bin_[++last_ix_] = ix_to_add;
+    //         bin_loc_[ix_to_add] = last_ix_;
+    //         return true;
+    //     }
 
-        auto remove_from_bin(uint_type ix_to_remove) -> bool {
-            #ifndef UNSAFE_OPTIM
-            if (ix_to_remove >= size_) return false;
-            if (bin_loc_[ix_to_remove] == INVALID_IX) return false;
-            #endif
+    //     auto remove_from_bin(uint_type ix_to_remove) -> bool {
+    //         #ifndef UNSAFE_OPTIM
+    //         if (ix_to_remove >= size_) return false;
+    //         if (bin_loc_[ix_to_remove] == INVALID_IX) return false;
+    //         #endif
 
-            std::swap(ix_bin_[bin_loc_[ix_to_remove]], ix_bin_[last_ix_--]);
-            bin_loc_[ix_to_remove] = INVALID_IX;
-            return true;
-        }
+    //         std::swap(ix_bin_[bin_loc_[ix_to_remove]], ix_bin_[last_ix_--]);
+    //         bin_loc_[ix_to_remove] = INVALID_IX;
+    //         return true;
+    //     }
 
-        inline auto size() -> uint_type {
-            return last_ix_ + 1;
-        }
+    //     inline auto size() -> uint_type {
+    //         return last_ix_ + 1;
+    //     }
 
-        inline auto get_ix_bin() const -> const uint_type *& {return ix_bin_;}
-        inline auto get_bin_loc() const -> const uint_type *& {return bin_loc_;}
-        inline auto get_bin_ptr() const -> uint_type {return last_ix_;}
+    //     inline auto get_ix_bin() const -> const uint_type *& {return ix_bin_;}
+    //     inline auto get_bin_loc() const -> const uint_type *& {return bin_loc_;}
+    //     inline auto get_bin_ptr() const -> uint_type {return last_ix_;}
 
     /**
      * Iterator functions
@@ -223,21 +223,21 @@ namespace g80 {
 
     public:
 
-        struct iterator {
-        private:
-            uint_type *ptr;
-        public:
-            iterator(uint_type *data) {ptr = data;}
-            auto operator*() -> uint_type & {return *ptr;}
-            auto operator->() -> uint_type * {return ptr;}
-            auto operator++() -> iterator & {++ptr; return *this;};
-            auto operator++(int) -> iterator {iterator t = *this; ++ptr; return t;};
-            friend auto operator ==(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr == rhs.ptr;}
-            friend auto operator !=(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr != rhs.ptr;}
-        };
+        // struct iterator {
+        // private:
+        //     uint_type *ptr;
+        // public:
+        //     iterator(uint_type *data) {ptr = data;}
+        //     auto operator*() -> uint_type & {return *ptr;}
+        //     auto operator->() -> uint_type * {return ptr;}
+        //     auto operator++() -> iterator & {++ptr; return *this;};
+        //     auto operator++(int) -> iterator {iterator t = *this; ++ptr; return t;};
+        //     friend auto operator ==(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr == rhs.ptr;}
+        //     friend auto operator !=(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr != rhs.ptr;}
+        // };
 
-        auto begin() const -> iterator {return iterator(ix_bin_);}
-        auto end() const -> iterator {return iterator(ix_bin_ + last_ix_ + 1);}
+        // auto begin() const -> iterator {return iterator(ix_bin_);}
+        // auto end() const -> iterator {return iterator(ix_bin_ + last_ix_ + 1);}
 
     /**
      * Internal table index variables 
@@ -246,10 +246,10 @@ namespace g80 {
 
     private:
     
-        static constexpr uint_type INVALID_IX = ~static_cast<uint_type>(0);
-        uint_type size_{0};
-        uint_type last_ix_{INVALID_IX};  
-        uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
+        // static constexpr uint_type INVALID_IX = ~static_cast<uint_type>(0);
+        // uint_type size_{0};
+        // uint_type last_ix_{INVALID_IX};  
+        // uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
     };
 }
 
