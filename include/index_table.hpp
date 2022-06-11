@@ -9,37 +9,76 @@
  * 
  */
 
+        // Maximum values that can be stored in index table = 2^size_in_bits(uint_type) - 1
+        // Index Table uses ~static_cast<uint_type>(0) as invalid ix
+
+
 #ifndef INDEX_TABLE_HPP
 #define INDEX_TABLE_HPP
 
 namespace g80 {
 
-    // #define UNSAFE_OPTIM
+    #define UNSAFE_OPTIM
 
     template<typename uint_type>
     class index_table {
     
+    /**
+     * Constructor, Destructor and 
+     * Assignment Helpers
+     * 
+     */
 
-    public:
-        
-        // Maximum values that can be stored in index table = 2^size_in_bits(uint_type) - 1
-        // Index Table uses ~static_cast<uint_type>(0) as invalid ix
+    private:
 
-        index_table(uint_type size) : size_(size) {
-            reset(size_);
-        }
-        
-        auto copy_index_table(const index_table &rhs) -> void {
-            reset(size_);
-            std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
-            std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
-        }
-
-        auto delete_index_bin_loc() -> void {
+        auto del_ix_bin_loc() -> void {
             delete []ix_bin_;
             delete []bin_loc_;
             ix_bin_ = {nullptr};
             bin_loc_ = {nullptr};
+        }
+
+        auto new_ix_bin_loc() -> void {
+            ix_bin_ = new uint_type[size_];
+            bin_loc_ = new uint_type[size_];
+        }
+
+        auto reset_bin_loc_() -> void {
+            memset(bin_loc_, ~0, sizeof(uint_type) * size_);
+        }
+
+        auto reset() -> void {
+            del_ix_bin_loc();
+            new_ix_bin_loc();
+            reset_bin_loc_();
+        }
+
+    public:
+
+        auto reset(const uint_type size) {
+            size_(size);
+            last_ix_ = {INVALID_IX};
+            reset();
+        }
+    
+    private:
+
+        auto copy_index_table(const index_table &rhs) -> void {
+            std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
+            std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
+        }
+        
+    /**
+     * Constructor, Destructor and 
+     * Assignment Functions
+     * 
+     */
+
+    public:
+        
+        index_table(uint_type size) : size_(size) {
+            new_ix_bin_loc();
+            reset_bin_loc_();
         }
 
         index_table(const index_table &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
@@ -54,8 +93,11 @@ namespace g80 {
         }
 
         auto operator=(const index_table &rhs) -> index_table & {
+            del_ix_bin_loc();
+            
             size_ = rhs.size_;
             last_ix_ = rhs.last_ix_;
+            new_ix_bin_loc();
             copy_index_table(rhs);
             return *this;
         }
@@ -65,7 +107,7 @@ namespace g80 {
             size_ = rhs.size_;
             last_ix_ = rhs.last_ix_;
             
-            delete_index_bin_loc();
+            del_ix_bin_loc();
             ix_bin_ = rhs.ix_bin_;
             bin_loc_ = rhs.bin_loc_;
 
@@ -78,17 +120,7 @@ namespace g80 {
         }
 
         ~index_table() {
-            delete_index_bin_loc();
-        }
-
-        auto reset(uint_type size) -> void {
-
-            delete []ix_bin_;
-            delete []bin_loc_;
-            ix_bin_ = new uint_type[size_];
-            bin_loc_ = new uint_type[size_];
-
-            memset(bin_loc_, ~0, sizeof(uint_type) * size_);
+            del_ix_bin_loc();
         }
 
         auto add_to_bin(uint_type ix_to_add) -> bool {
