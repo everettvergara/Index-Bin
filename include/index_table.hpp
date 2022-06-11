@@ -24,7 +24,7 @@
  * @note: 
  * 
  * The maximum values that can be stored in an index_table class is:
- *      2 ^ no_of_bits(uint_type) - 1
+ *      {2 ^ no_of_bits(uint_type)} - 1
  * 
  * Because index_table uses ~static_cast<uint_type>(0) as its invalid index
  * 
@@ -37,10 +37,25 @@
 
 namespace g80 {
 
+    /**
+     * Uncomment #define UNSAFE_OPTIM if you are sure that your 
+     * program won't go beyond the boundaries of uint_type
+     * 
+     * #define UNSAFE_OPTIM 
+     * 
+     */
+    
     #define UNSAFE_OPTIM
+
+    /**
+     * Template class proper for 
+     * index_table
+     * 
+     */
 
     template<typename uint_type>
     class index_table {
+    
     /**
      * Template validation
      * 
