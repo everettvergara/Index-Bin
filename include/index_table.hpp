@@ -50,14 +50,14 @@ namespace g80 {
             return true;
         }
 
-        auto remove_from_bin(uint_type ix) -> bool {
+        auto remove_from_bin(uint_type ix_to_remove) -> bool {
             #ifndef UNSAFE_OPTIM
-            if (ix >= size_) return false;
-            if (bin_loc_[ix] == INVALID_IX) return false;
+            if (ix_to_remove >= size_) return false;
+            if (bin_loc_[ix_to_remove] == INVALID_IX) return false;
             #endif
 
-            std::swap(ix_bin_[bin_loc_[ix]], ix_bin_[last_ix_--]);
-            bin_loc_[ix] = INVALID_IX;
+            std::swap(ix_bin_[bin_loc_[ix_to_remove]], ix_bin_[last_ix_--]);
+            bin_loc_[ix_to_remove] = INVALID_IX;
             return true;
         }
 
@@ -65,10 +65,9 @@ namespace g80 {
             return last_ix_ + 1;
         }
 
-        // inline auto get_ix_bin() const -> const std::array<uint_type, N> & {return ix_bin_;}
-        // inline auto get_bin_loc() const -> const std::array<uint_type, N> & {return bin_loc_;}
+        inline auto get_ix_bin() const -> const uint_type *& {return ix_bin_;}
+        inline auto get_bin_loc() const -> const uint_type *& {return bin_loc_;}
         inline auto get_bin_ptr() const -> uint_type {return last_ix_;}
-        
 
     private:
     
