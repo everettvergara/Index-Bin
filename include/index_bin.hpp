@@ -45,8 +45,8 @@
  * 
  */
 
-#ifndef INDEX_TABLE_HPP
-#define INDEX_TABLE_HPP
+#ifndef INDEX_BIN_HPP
+#define INDEX_BIN_HPP
 
 #include <type_traits>
 
@@ -64,12 +64,12 @@ namespace g80 {
 
     /**
      * Template class proper for 
-     * index_table
+     * index_bin
      * 
      */
 
     template<typename uint_type>
-    class index_table {
+    class index_bin {
     
     /**
      * Template validation
@@ -110,7 +110,7 @@ namespace g80 {
             std::fill_n(bin_loc_, size_, INVALID_IX);
         }
     
-        auto copy_index_table(const index_table &rhs) -> void {
+        auto copy_index_bin(const index_bin &rhs) -> void {
             std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
             std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
         }
@@ -132,33 +132,33 @@ namespace g80 {
 
     public:
         
-        index_table(uint_type size) : size_(size) {
+        index_bin(uint_type size) : size_(size) {
             new_ix_bin_loc();
             reset_bin_loc_();
         }
 
-        index_table(const index_table &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
-            copy_index_table(rhs);
+        index_bin(const index_bin &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
+            copy_index_bin(rhs);
         }
 
-        index_table(index_table &&rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_), ix_bin_(rhs.ix_bin_), bin_loc_(rhs.bin_loc_) {
+        index_bin(index_bin &&rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_), ix_bin_(rhs.ix_bin_), bin_loc_(rhs.bin_loc_) {
             rhs.size_ = {0};
             rhs.last_ix_ = rhs.INVALID_IX;
             rhs.ix_bin_ = {nullptr};
             rhs.bin_loc_ = {nullptr};
         }
 
-        auto operator=(const index_table &rhs) -> index_table & {
+        auto operator=(const index_bin &rhs) -> index_bin & {
             del_ix_bin_loc();
             
             size_ = rhs.size_;
             last_ix_ = rhs.last_ix_;
             new_ix_bin_loc();
-            copy_index_table(rhs);
+            copy_index_bin(rhs);
             return *this;
         }
 
-        auto operator=(index_table &&rhs) -> index_table & {
+        auto operator=(index_bin &&rhs) -> index_bin & {
             
             del_ix_bin_loc();
             
@@ -175,7 +175,7 @@ namespace g80 {
             return *this;
         }
 
-        ~index_table() {
+        ~index_bin() {
             del_ix_bin_loc();
         }
 

@@ -1,10 +1,10 @@
 #include <iostream>
-#include "index_table.hpp"
+#include "index_bin.hpp"
 
 using namespace g80;
 auto main(const int argc, const char *argv[]) -> int {
 
-    using yyy = unsigned char;
-    index_table<yyy> table(10);
+    // using yyy = unsigned char;
+    // index_table<yyy> table(10);
 
 } 
