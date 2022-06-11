@@ -263,7 +263,7 @@ namespace g80 {
     private:
     
         uint_type size_, start_of_unused_ix_{0};
-        uint_type *bin_, *mapper_;
+        uint_type *bin_{nullptr}, *mapper_{nullptr};
     };
 }
 
