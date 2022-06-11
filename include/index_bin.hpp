@@ -193,29 +193,55 @@ namespace g80 {
      * 
      */
 
-    // public:
+    public:
 
-    //     auto add_to_bin(uint_type ix_to_add) -> bool {
-    //         #ifndef UNSAFE_OPTIM
-    //         if (ix_to_add >= size_) return false;
-    //         if (bin_loc_[ix_to_add] != INVALID_IX) return false;
-    //         #endif
+        auto use(uint_type ix_to_use) -> bool {
+            if (ix_to_use >= size_) return false;
+            if (mapper_[ix_to_use] < start_of_unused_ix_) return false;
+            
+            /**
+             * Bin:
+             * Used     | Unused
+             * 0 1 2 3    4 5 6 7 8 9 10
+             * 4 5 2 10 | 0 9 1 3 6 7 8 
+             *            ^ ^  
+             *              u
+             * Index Mapper
+             * 0 1 2 3 4 5 6 7 8  9 10
+             * 4 6 2 7 0 1 8 9 10 5 3  
+             * ^                  ^
+             */
 
-    //         ix_bin_[++last_ix_] = ix_to_add;
-    //         bin_loc_[ix_to_add] = last_ix_;
-    //         return true;
-    //     }
+            std::swap(bin[mapper[start_of_unused_ix_]], bin[mapper[ix_to_use]]);
+            std::swap(mapper[start_of_unused_ix_], mapper[ix_to_use]);
+            ++start_of_unused_ix_;
 
-    //     auto remove_from_bin(uint_type ix_to_remove) -> bool {
-    //         #ifndef UNSAFE_OPTIM
-    //         if (ix_to_remove >= size_) return false;
-    //         if (bin_loc_[ix_to_remove] == INVALID_IX) return false;
-    //         #endif
+            return true;
+        }
 
-    //         std::swap(ix_bin_[bin_loc_[ix_to_remove]], ix_bin_[last_ix_--]);
-    //         bin_loc_[ix_to_remove] = INVALID_IX;
-    //         return true;
-    //     }
+        auto unuse(uint_type ix_to_unuse) -> bool {
+            if (ix_to_unuse >= size_) return false;
+            if (mapper_[ix_to_unuse] >= start_of_unused_ix_) return false;
+            
+            /**
+             * Bin:
+             * Used     | Unused
+             * 0 1 2 3    4 5 6 7 8 9 10
+             * 4 5 2 10 | 0 9 1 3 6 7 8 
+             *     ^  ^ 
+             *              
+             * Index Mapper
+             * 0 1 2 3 4 5 6 7 8  9 10
+             * 4 6 2 7 0 1 8 9 10 5 3  
+             *     ^                ^
+             */
+            
+            --start_of_unused_ix_;
+            std::swap(bin[mapper[start_of_unused_ix_]], bin[mapper[ix_to_use]]);
+            std::swap(mapper[start_of_unused_ix_], mapper[ix_to_use]);
+            
+            return true;
+        }
 
     //     inline auto size() -> uint_type {
     //         return last_ix_ + 1;
