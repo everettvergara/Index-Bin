@@ -92,29 +92,35 @@ namespace g80 {
      * 
      */
 
-    // private:
+    private:
 
-    //     auto del_ix_bin_loc() -> void {
-    //         delete []ix_bin_;
-    //         delete []bin_loc_;
-    //         ix_bin_ = {nullptr};
-    //         bin_loc_ = {nullptr};
-    //     }
+        auto del_bin_and_mapper() -> void {
+            delete []bin_;
+            delete []mapper_;
+            bin_ = {nullptr};
+            mapper_ = {nullptr};
+        }
 
-    //     auto new_ix_bin_loc() -> void {
-    //         ix_bin_ = new uint_type[size_];
-    //         bin_loc_ = new uint_type[size_];
-    //     }
+        auto new_bin_and_mapper() -> void {
+            bin_ = new uint_type[size_];
+            mapper_ = new uint_type[size_];
+        }
 
-    //     auto reset_bin_loc_() -> void {
-    //         std::fill_n(bin_loc_, size_, INVALID_IX);
-    //     }
+        auto reset_mapper_() -> void {
+            for (int i = 0; i < size_; ++i) mapper_[i] = i;
+        }
     
-    //     auto copy_index_bin(const index_bin &rhs) -> void {
-    //         std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
-    //         std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
-    //     }
+        auto copy_index_bin(const index_bin &rhs) -> void {
+            std::copy(rhs.bin_, rhs.bin_ + size_, bin_);
+            std::copy(rhs.mapper_, rhs.mapper_ + size_, mapper_);
+        }
 
+        auto reset_rhs(index_bin &rhs) {
+            rhs.size_ = {0};
+            rhs.start_of_unused_ix_ = {0};
+            rhs.ix_bin_ = {nullptr};
+            rhs.bin_loc_ = {nullptr};
+        }
     // public:
 
     //     auto reset(const uint_type size) {
@@ -132,52 +138,55 @@ namespace g80 {
 
     public:
         
-        // index_bin(uint_type size) : size_(size) {
-        //     new_ix_bin_loc();
-        //     reset_bin_loc_();
-        // }
+        index_bin(uint_type size) : size_(size) {
+            new_bin_and_mapper();
+            reset_mapper_();
+        }
 
-        // index_bin(const index_bin &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
-        //     copy_index_bin(rhs);
-        // }
+        index_bin(const index_bin &rhs) : 
+            size_(rhs.size_), 
+            start_of_unused_ix_(rhs.start_of_unused_ix_), 
+            bin_(new uint_type[size_]), 
+            mapper_(new uint_type[size_]) {
+            copy_index_bin(rhs);
+        }
 
-        // index_bin(index_bin &&rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_), ix_bin_(rhs.ix_bin_), bin_loc_(rhs.bin_loc_) {
-        //     rhs.size_ = {0};
-        //     rhs.last_ix_ = rhs.INVALID_IX;
-        //     rhs.ix_bin_ = {nullptr};
-        //     rhs.bin_loc_ = {nullptr};
-        // }
-
-        // auto operator=(const index_bin &rhs) -> index_bin & {
-        //     del_ix_bin_loc();
+        index_bin(index_bin &&rhs) : 
+            size_(rhs.size_), 
+            start_of_unused_ix_(rhs.start_of_unused_ix_), 
+            bin_(rhs.bin_), 
+            mapper_(rhs.mapper_) {
             
-        //     size_ = rhs.size_;
-        //     last_ix_ = rhs.last_ix_;
-        //     new_ix_bin_loc();
-        //     copy_index_bin(rhs);
-        //     return *this;
-        // }
+            reset_rhs(rhs);
+        }
 
-        // auto operator=(index_bin &&rhs) -> index_bin & {
+        auto operator=(const index_bin &rhs) -> index_bin & {
+            del_bin_and_mapper();
             
-        //     del_ix_bin_loc();
+            size_ = rhs.size_;
+            start_of_unused_ix_ = rhs.start_of_unused_ix_;
+            new_bin_and_mapper();
+            copy_index_bin(rhs);
+            return *this;
+        }
+
+        auto operator=(index_bin &&rhs) -> index_bin & {
             
-        //     size_ = rhs.size_;
-        //     last_ix_ = rhs.last_ix_;
-        //     ix_bin_ = rhs.ix_bin_;
-        //     bin_loc_ = rhs.bin_loc_;
+            del_bin_and_mapper();
+            
+            size_ = rhs.size_;
+            start_of_unused_ix_ = rhs.start_of_unused_ix_;
+            bin_ = rhs.bin_;
+            mapper_ = rhs.mapper_;
 
-        //     rhs.size_ = {0};
-        //     rhs.last_ix_ = rhs.INVALID_IX;
-        //     rhs.ix_bin_ = {nullptr};
-        //     rhs.bin_loc_ = {nullptr};
+            reset_rhs(rhs);
 
-        //     return *this;
-        // }
+            return *this;
+        }
 
-        // ~index_bin() {
-        //     del_ix_bin_loc();
-        // }
+        ~index_bin() {
+            del_bin_and_mapper();
+        }
 
     /**
      * Public Interface
@@ -247,7 +256,9 @@ namespace g80 {
     private:
     
         // static constexpr uint_type INVALID_IX = ~static_cast<uint_type>(0);
-        // uint_type size_{0};
+        uint_type size_, start_of_unused_ix_{0};
+        uint_type *bin_, *mapper_;
+
         // uint_type last_ix_{INVALID_IX};  
         // uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
     };
