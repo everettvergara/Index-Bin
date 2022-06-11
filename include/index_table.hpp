@@ -33,13 +33,29 @@
 #ifndef INDEX_TABLE_HPP
 #define INDEX_TABLE_HPP
 
+#include <type_traits>
+
 namespace g80 {
 
     #define UNSAFE_OPTIM
 
     template<typename uint_type>
     class index_table {
-    
+    /**
+     * Template validation
+     * 
+     */
+
+    static_assert(
+        std::is_same<uint_type, unsigned char>::value || std::is_same<uint_type, unsigned int>::value || 
+        std::is_same<uint_type, unsigned short>::value || std::is_same<uint_type, unsigned long>::value || 
+        std::is_same<uint_type, unsigned long long>::value || 
+
+        std::is_same<uint_type, uint8_t>::value || std::is_same<uint_type, uint16_t>::value || 
+        std::is_same<uint_type, uint32_t>::value || std::is_same<uint_type, uint64_t>::value,
+
+        "Must be of unsigned integral type");
+
     /**
      * Constructor, Destructor and 
      * Assignment Helpers
@@ -61,7 +77,7 @@ namespace g80 {
         }
 
         auto reset_bin_loc_() -> void {
-            memset(bin_loc_, ~static_cast<int>(0), sizeof(uint_type) * size_);
+            std::fill_n(bin_loc_, size_, INVALID_IX);
         }
     
         auto copy_index_table(const index_table &rhs) -> void {
@@ -200,7 +216,7 @@ namespace g80 {
 
     private:
     
-        static constexpr uint_type INVALID_IX {~static_cast<uint_type>(0)};
+        static constexpr uint_type INVALID_IX = ~static_cast<uint_type>(0);
         uint_type size_{0};
         uint_type last_ix_{INVALID_IX};  
         uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
