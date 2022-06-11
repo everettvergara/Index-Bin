@@ -198,7 +198,7 @@ namespace g80 {
 
     public:
 
-        auto is_use(const uint_type ix_to_check) -> bool {
+        auto is_used(const uint_type ix_to_check) -> bool {
             return mapper_[ix_to_check] < start_of_unused_ix_;
         }
 
