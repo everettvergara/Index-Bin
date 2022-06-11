@@ -25,18 +25,69 @@ namespace g80 {
         // Maximum values that can be stored in index table = 2^size_in_bits(uint_type) - 1
         // Index Table uses ~static_cast<uint_type>(0) as invalid ix
 
-        index_table(uint_type size) : size_(size) {reset(size_);}
+        index_table(uint_type size) : size_(size) {
+            reset(size_);
+        }
+        
+        auto copy_index_table(const index_table &rhs) -> void {
+            reset(size_);
+            std::copy(rhs.ix_bin_, rhs.ix_bin_ + size_, ix_bin_);
+            std::copy(rhs.bin_loc_, rhs.bin_loc_ + size_, bin_loc_);
+        }
+
+        auto delete_index_bin_loc() -> void {
+            delete []ix_bin_;
+            delete []bin_loc_;
+            ix_bin_ = {nullptr};
+            bin_loc_ = {nullptr};
+        }
+
+        index_table(const index_table &rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_) {
+            copy_index_table(rhs);
+        }
+
+        index_table(index_table &&rhs) : size_(rhs.size_), last_ix_(rhs.last_ix_), ix_bin_(rhs.ix_bin_), bin_loc_(rhs.bin_loc_) {
+            rhs.size_ = {0};
+            rhs.last_ix_ = rhs.INVALID_IX;
+            rhs.ix_bin_ = {nullptr};
+            rhs.bin_loc_ = {nullptr};
+        }
+
+        auto operator=(const index_table &rhs) -> index_table & {
+            size_ = rhs.size_;
+            last_ix_ = rhs.last_ix_;
+            copy_index_table(rhs);
+            return *this;
+        }
+
+        auto operator=(index_table &&rhs) -> index_table & {
+            
+            size_ = rhs.size_;
+            last_ix_ = rhs.last_ix_;
+            
+            delete_index_bin_loc();
+            ix_bin_ = rhs.ix_bin_;
+            bin_loc_ = rhs.bin_loc_;
+
+            rhs.size_ = {0};
+            rhs.last_ix_ = rhs.INVALID_IX;
+            rhs.ix_bin_ = {nullptr};
+            rhs.bin_loc_ = {nullptr};
+
+            return *this;
+        }
+
+        ~index_table() {
+            delete_index_bin_loc();
+        }
 
         auto reset(uint_type size) -> void {
 
-            if (size != size_) {
-                delete []ix_bin_;
-                delete []bin_loc_;
-                ix_bin_ = new uint_type[size_];
-                bin_loc_ = new uint_type[size_];
-            }
+            delete []ix_bin_;
+            delete []bin_loc_;
+            ix_bin_ = new uint_type[size_];
+            bin_loc_ = new uint_type[size_];
 
-            last_ix_ = INVALID_IX;
             memset(bin_loc_, ~0, sizeof(uint_type) * size_);
         }
 
@@ -75,20 +126,23 @@ namespace g80 {
             uint_type *ptr;
         public:
             iterator(uint_type *data) {ptr = data;}
-            auto operator *() -> uint_type & {return *ptr;}
-            auto operator ->() -> uint_type * {return ptr;}
-            auto operator ++() -> iterator & {++ptr; return *this;};
-            auto operator ++(int) -> iterator {iterator t = *this; ++ptr; return t;};
+            auto operator*() -> uint_type & {return *ptr;}
+            auto operator->() -> uint_type * {return ptr;}
+            auto operator++() -> iterator & {++ptr; return *this;};
+            auto operator++(int) -> iterator {iterator t = *this; ++ptr; return t;};
             friend auto operator ==(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr == rhs.ptr;}
             friend auto operator !=(const iterator &lhs, const iterator &rhs) -> bool {return lhs.ptr != rhs.ptr;}
         };
 
+        auto begin() const -> iterator {return iterator(ix_bin_);}
+        auto end() const -> iterator {return iterator(ix_bin_ + last_ix_ + 1);}
+
     private:
     
         static constexpr uint_type INVALID_IX {~static_cast<uint_type>(0)};
-        uint_type size_;
-        uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
+        uint_type size_{0};
         uint_type last_ix_{INVALID_IX};  
+        uint_type *ix_bin_{nullptr}, *bin_loc_{nullptr};
     };
 
 }
