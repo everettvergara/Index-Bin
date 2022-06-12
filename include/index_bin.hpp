@@ -225,6 +225,11 @@ namespace g80 {
             return true;
         }
 
+        auto is_used(const uint_type ix_to_check) -> bool {
+            return ix_to_check < start_of_unused_ix_;
+        }
+        
+
         inline auto size() const -> uint_type {
             return size_;
         }
