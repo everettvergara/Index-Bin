@@ -132,7 +132,7 @@ namespace g80 {
             reset_mapper_();
         }
 
-        auto reset_start_of_unused_ix() {
+        inline auto reset_start_of_unused_ix() {
             start_of_unused_ix_ = {0};
         }
 
